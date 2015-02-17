@@ -71,8 +71,12 @@ instance Yesod App where
     isAuthorized (AuthR _) _ = return Authorized
     isAuthorized FaviconR _ = return Authorized
     isAuthorized RobotsR _ = return Authorized
-    -- Default to Authorized for now.
-    isAuthorized _ _ = return Authorized
+
+    -- My auth stuff
+    isAuthorized HomeR _ = isRegistered
+
+    -- Default to AuthenticationRequired.
+    isAuthorized _ _ = return AuthenticationRequired
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
@@ -101,6 +105,25 @@ instance Yesod App where
             || level == LevelError
 
     makeLogger = return . appLogger
+
+-- To check whether a user is in the User DB
+isRegistered :: (YesodAuthPersist master,
+                 PersistStore (PersistEntityBackend (AuthEntity master)),
+                 PersistEntity (AuthEntity master), Typeable (AuthEntity master),
+                 AuthId master ~ Key (AuthEntity master),
+                 YesodPersistBackend master
+                 ~ PersistEntityBackend (AuthEntity master)) =>
+                HandlerT master IO AuthResult
+isRegistered =  do
+  mauth <- maybeAuth
+  case mauth of
+   Nothing -> return AuthenticationRequired
+   Just (Entity uid _) -> runDB $ do
+     dbUser <- get uid
+     case dbUser of
+      (Just _) -> return Authorized
+      Nothing -> return AuthenticationRequired
+               
 
 -- How to run database actions.
 instance YesodPersist App where
