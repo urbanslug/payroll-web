@@ -1,0 +1,3 @@
+<h1> Add a payslip.
+<form .form-horizontal method=post action=@{PayslipNewR} action=#{enctype}>
+  ^{widget} 

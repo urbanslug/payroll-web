@@ -6,4 +6,4 @@
 
 / HomeR GET
 /payslip/new        PayslipNewR  GET POST
-/payslip/!PayslipId PayslipShowR GET POST
+/payslip/!#PayslipId PayslipShowR GET DELETE

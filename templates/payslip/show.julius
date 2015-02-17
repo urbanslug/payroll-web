@@ -1,0 +1,17 @@
+function ready(fn) {
+  if (document.readyState != 'loading'){
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+  });
+  
+  document.getElementById("delete").addEventListener('click', function(e) {
+    var del = new XMLHttpRequest ();
+    del.onload = function (event) {alert ('payslip deleted');};
+    req.open ('delete', @{PayslipShowR payslipId}, 'true');
+    req.send ()
+  });
+    
+});

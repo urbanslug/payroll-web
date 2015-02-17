@@ -2,8 +2,15 @@ module Handler.PayslipShow where
 
 import Import
 
-getPayslipShowR :: Handler Html
-getPayslipShowR = error "Not yet implemented: getPayslipShowR"
-
-postPayslipShowR :: Handler Html
-postPayslipShowR = error "Not yet implemented: postPayslipShowR"
+getPayslipShowR :: PayslipId ->  Handler Html
+getPayslipShowR payslipId = do
+  payslip <- runDB $ get404 payslipId
+  defaultLayout $ do
+    $(widgetFile "payslip/show")
+    
+-- deletePayslipShowR :: moand m => PayslipId -> ReaderT (PersistEntityBackend Payslip) m ()
+deletePayslipShowR :: PayslipId -> Handler Html
+deletePayslipShowR payslipId = do
+  runDB $ delete payslipId
+  defaultLayout $ do
+    $(widgetFile "payslip/deleted")

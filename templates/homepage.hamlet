@@ -1,1 +1,10 @@
 <h1> You are viewing your payroll.
+
+<div .jumbotron>
+    $if null myPayslips
+      <p> Sorry you have no payslips yet.
+    $else
+      $forall Entity _ payslip <- myPayslips
+        <ul>
+          <li> #{payslipEmployeeNumber payslip}
+    

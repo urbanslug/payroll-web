@@ -12,4 +12,9 @@ import Import
 -- functions. You can spread them across multiple files if you are so
 -- inclined, or create a single monolithic file.
 getHomeR :: Handler Html
-getHomeR = error "to do"
+getHomeR = do
+  (Entity uid _) <- requireAuth
+  myPayslips <- runDB $ selectList [PayslipOwner ==. uid] [Desc PayslipId]
+  defaultLayout $ do
+    setTitle "Payroll"
+    $(widgetFile "homepage")

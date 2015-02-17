@@ -1,0 +1,3 @@
+<p> Payslip added
+  #{payslipEmployeeNumber payslip}
+  <input type="submit" name="delete" id="delete" class="btn btn-default" value="Delete payslip" >
