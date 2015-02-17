@@ -1,12 +1,14 @@
 User
     ident Text
-    password Text Maybe
     UniqueUser ident
     deriving Typeable
-Email
-    email Text
-    user UserId Maybe
-    verkey Text Maybe
-    UniqueEmail email
+Payslip
+  employeeNumber Int
+  basicSalary Int
+  allowances Int
+  deductions Int
+  nssf Int
+  nhif Int
+  owner UserId
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)
