@@ -1,3 +1,7 @@
-<p> Payslip added
+$if (payslipOwner payslip) == uid
   #{payslipEmployeeNumber payslip}
   <input type="submit" name="delete" id="delete" class="btn btn-default" value="Delete payslip" >
+$else
+  <p> Login first
+  <a @{HomeR}> Login
+

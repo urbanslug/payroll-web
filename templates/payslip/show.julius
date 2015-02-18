@@ -5,8 +5,9 @@ function ready(fn) {
     document.addEventListener('DOMContentLoaded', fn);
   }
 }
-  });
-  
+
+ready(function() {
+
   document.getElementById("delete").addEventListener('click', function(e) {
     var del = new XMLHttpRequest ();
     del.onload = function (event) {alert ('payslip deleted');};
