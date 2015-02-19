@@ -8,11 +8,21 @@ function ready(fn) {
 
 ready(function() {
 
-  document.getElementById("delete").addEventListener('click', function(e) {
-    var del = new XMLHttpRequest ();
-    del.onload = function (event) {alert ('payslip deleted');};
-    req.open ('delete', @{PayslipShowR payslipId}, 'true');
-    req.send ()
+  document.getElementById("confirm").addEventListener('click', function(event) {
+    var del = new XMLHttpRequest();
+    del.onload = function (event) {window.location = "@{HomeR}"};
+    del.open('delete', "@{PayslipShowR payslipId}", 'true');
+    del.send();
+  });
+
+  document.getElementById("delete").addEventListener('click', function(event) {
+    el = document.getElementById("overlay");
+	  el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
+  });
+
+  document.getElementById("non-delete").addEventListener('click', function(event) {
+    el = document.getElementById("overlay");
+	  el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
   });
     
 });

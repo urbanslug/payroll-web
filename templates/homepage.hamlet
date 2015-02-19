@@ -1,10 +1,11 @@
 <h1> You are viewing your payroll.
 
 <div .jumbotron>
+    <a class="btn btn-default" href=@{PayslipNewR}>Add a payslip
     $if null myPayslips
       <p> Sorry you have no payslips yet.
     $else
-      $forall Entity _ payslip <- myPayslips
+      $forall Entity payslipId payslip <- myPayslips
         <ul>
-          <li> #{payslipEmployeeNumber payslip}
-    
+          <li><a href=@{PayslipShowR payslipId}>Payslip for employee number: #{payslipEmployeeNumber payslip}
+      

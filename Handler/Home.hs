@@ -14,7 +14,7 @@ import Import
 getHomeR :: Handler Html
 getHomeR = do
   (Entity uid _) <- requireAuth
-  myPayslips <- runDB $ selectList [PayslipOwner ==. uid] [Desc PayslipId]
+  myPayslips <- runDB $ selectList [PayslipOwner ==. uid] [Asc PayslipEmployeeNumber]
   defaultLayout $ do
     setTitle "Payroll"
     $(widgetFile "homepage")

@@ -1,7 +1,25 @@
 $if (payslipOwner payslip) == uid
-  #{payslipEmployeeNumber payslip}
-  <input type="submit" name="delete" id="delete" class="btn btn-default" value="Delete payslip" >
+  <p>
+    <ul>
+      <li>Employee Number: #{payslipEmployeeNumber payslip} 
+      <li>Basic salary: #{payslipBasicSalary payslip} 
+      <li>Allowances: #{payslipAllowances payslip} 
+      <li>Deductions: #{payslipDeductions payslip}
+      <li>NHIF: #{payslipNhif payslip}
+      <li>NSSF: #{payslipNssf payslip}
+  
+ <p>
+  <input type="button" id="delete" class="btn btn-default" value="Delete payslip" >
+  <a class="btn btn-default" href=@{PayslipNewR}>Add a payslip
+  <a class="btn btn-default" href=@{HomeR}>Home
+  <div id="overlay">
+    <div>
+      <p>
+        Are you sure you want to delete this payslip?
+      <p>
+        <input type="button" id="confirm" class="btn btn-default" value="Yes" >
+        <input type="button" id="non-delete"  class="btn btn-default" value="No" >
 $else
   <p> Login first
   <a @{HomeR}> Login
-
+  

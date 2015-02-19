@@ -76,7 +76,7 @@ instance Yesod App where
     isAuthorized HomeR _ = isRegistered
 
     -- Default to AuthenticationRequired.
-    isAuthorized _ _ = return AuthenticationRequired
+    isAuthorized _ _ = return Authorized
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
