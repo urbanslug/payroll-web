@@ -7,8 +7,17 @@ Payslip
   basicSalary Int
   allowances Int
   deductions Int
+  insuranceRelief Int
+  owner UserId
+Processed
+  taxableBenefits Int
+  taxableIncome Int
+  taxThereOn Int
   nssf Int
   nhif Int
-  owner UserId
-
+  personalRelief Int
+  paye Int
+  netSalary Int
+  payslip PayslipId
+  owner UserId  
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

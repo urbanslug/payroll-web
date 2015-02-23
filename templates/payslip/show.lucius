@@ -24,3 +24,14 @@ body {
      padding:15px;
      text-align:center;
 }
+
+table {
+  width: 50%;
+}
+
+.indent {
+  padding-left: 20px;
+}
+.credit {
+  float: right;
+}

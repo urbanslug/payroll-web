@@ -83,6 +83,7 @@ library
                  , containers
                  , vector
                  , time
+                 , payroll-core
 
 executable         payroll-web
     if flag(library-only)

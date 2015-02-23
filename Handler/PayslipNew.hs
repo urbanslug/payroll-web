@@ -2,6 +2,7 @@ module Handler.PayslipNew where
 
 import Import
 import Yesod.Form.Bootstrap3
+import Payroll
 
 payslipForm :: Key User -> AForm Handler Payslip
 payslipForm uid  =  Payslip
@@ -9,8 +10,7 @@ payslipForm uid  =  Payslip
   <*> areq intField (bfs ("Basic Salary" :: Text)) Nothing
   <*> areq intField (bfs ("Allowances" :: Text))  Nothing
   <*> areq intField (bfs ("Deductions" :: Text))  Nothing
-  <*> areq intField (bfs ("NSSF" :: Text))  Nothing
-  <*> areq intField (bfs ("NHIF" :: Text))  Nothing
+  <*> areq intField (bfs ("Insurance Relief" :: Text))  Nothing
   <*> pure uid
   <*  bootstrapSubmit (BootstrapSubmit {bsClasses="btn btn-default", bsValue="submit", bsAttrs=[("attr-name", "attr-value")]} :: BootstrapSubmit Text)
  
@@ -31,6 +31,29 @@ postPayslipNewR = do
   case result of
    FormSuccess payslip -> do
        payslipId <- runDB $ insert payslip
+       processed <- processPayslipM payslip payslipId
+       _ <- runDB $ insert processed
        redirect $ PayslipShowR payslipId
    _ -> defaultLayout $(widgetFile "payslip/new")
 
+processPayslipM :: (Monad m) => Payslip -> PayslipId -> m Processed
+processPayslipM p pId = return $ processPayslip p pId
+
+processPayslip :: Payslip -> PayslipId -> Processed
+processPayslip payslip@(Payslip _ basicSalary allowances deductions insuranceRelief _) payslipId =
+  let taxableB = taxableBenefits basicSalary [allowances]
+      taxableI = taxableIncome taxableB [deductions]
+      tThereon = taxThereOn taxableI
+      tPaye = paye tThereon insuranceRelief
+      netSal = netSalary taxableI tPaye
+  in  Processed { processedTaxableBenefits = taxableB, 
+                  processedTaxableIncome = taxableI,
+                  processedTaxThereOn = tThereon,
+                  processedNssf = nssf,
+                  processedNhif = nhif,
+                  processedPersonalRelief = personalRelief,
+                  processedPaye = tPaye,
+                  processedNetSalary = netSal,
+                  processedPayslip = payslipId,
+                  processedOwner = payslipOwner payslip
+                }

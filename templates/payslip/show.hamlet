@@ -1,13 +1,48 @@
 $if (payslipOwner payslip) == uid
-  <p>
-    <ul>
-      <li>Employee Number: #{payslipEmployeeNumber payslip} 
-      <li>Basic salary: #{payslipBasicSalary payslip} 
-      <li>Allowances: #{payslipAllowances payslip} 
-      <li>Deductions: #{payslipDeductions payslip}
-      <li>NHIF: #{payslipNhif payslip}
-      <li>NSSF: #{payslipNssf payslip}
-  
+  <table>
+    <tr>
+      <td>Employee Number:
+      <td>#{payslipEmployeeNumber payslip}
+    <tr>
+      <td>Basic salary:
+      <td class="credit">#{payslipBasicSalary payslip}
+    <tr>
+      <td>Allowances:
+      <td class="credit">#{payslipAllowances payslip}
+    <tr>
+      <td>Taxable benefits:
+      <td class="credit">#{processedTaxableBenefits processed}
+    <tr>
+      <td>Deductions:
+      <td>#{payslipDeductions payslip}
+    <tr>
+      <td>Contributions 
+      <tr>
+        <td class="indent">NSSF:
+        <td>#{processedNssf processed}
+      <tr>
+        <td class="indent">NHIF:
+        <td>#{processedNhif processed}
+    <tr>
+      <td>Taxable Income:
+      <td class="credit">#{processedTaxableIncome processed}
+    <tr>
+      <td>Tax Thereon:
+      <td class="credit">#{processedTaxThereOn processed}
+    <tr>
+      <td>Relief
+      <tr>
+        <td class="indent">Personal:
+        <td>#{processedPersonalRelief processed}
+      <tr>
+        <td class="indent">Insurance:
+        <td>#{payslipInsuranceRelief payslip}
+    <tr>
+      <td>PAYE:
+      <td>#{processedPaye processed}
+    <tr>
+      <td>Net Salary:
+      <td class="credit">#{processedNetSalary processed}
  <p>
   <input type="button" id="delete" class="btn btn-default" value="Delete payslip" >
   <a class="btn btn-default" href=@{PayslipNewR}>Add a payslip
