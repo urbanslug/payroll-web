@@ -6,7 +6,7 @@ getPayslipShowR :: PayslipId ->  Handler Html
 getPayslipShowR payslipId = do
   (Entity uid _) <- requireAuth
   payslip <- runDB $ get404 payslipId
-  ((Entity _ processed): _) <- runDB $ selectList [ProcessedPayslip ==. payslipId] []
+  (Entity _ processed) <- runDB $ getBy404 $ UniquePayslip payslipId
   defaultLayout $ do
        $(widgetFile "payslip/show")
 
