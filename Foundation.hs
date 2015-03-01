@@ -4,7 +4,7 @@ import Import.NoFoundation
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Text.Hamlet          (hamletFile)
 import Text.Jasmine         (minifym)
-import Yesod.Auth.HashDB    (HashDBUser(..), getAuthIdHashDB, authHashDBWithForm)
+import Yesod.Auth.HashDB    (HashDBUser(..), getAuthIdHashDB, authHashDB)
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
@@ -74,7 +74,7 @@ instance Yesod App where
     isAuthorized SignUpR   _ = return Authorized
     
     -- Default to AuthenticationRequired.
-    isAuthorized _ _ = return AuthenticationRequired
+    isAuthorized _ _ = isRegistered
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
@@ -103,6 +103,7 @@ instance Yesod App where
             || level == LevelError
 
     makeLogger = return . appLogger
+       
 
 -- Make users an instance of HashDB
 instance HashDBUser User where
@@ -131,13 +132,11 @@ instance YesodAuth App where
     getAuthId = getAuthIdHashDB AuthR (Just . UniqueUser)
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = [ authHashDBWithForm loginForm (Just . UniqueUser)]
+    authPlugins _ = [ authHashDB (Just . UniqueUser)]
 
     authHttpManager = getHttpManager
-
-loginForm :: Route App -> Widget
-loginForm theLogin = $(whamletFile "templates/login.hamlet")
-
+    
+    
 instance YesodAuthPersist App
 
 -- This instance is required to use forms. You can modify renderMessage to
@@ -155,3 +154,10 @@ unsafeHandler = Unsafe.fakeHandlerGetLogger appLogger
 -- https://github.com/yesodweb/yesod/wiki/Sending-email
 -- https://github.com/yesodweb/yesod/wiki/Serve-static-files-from-a-separate-domain
 -- https://github.com/yesodweb/yesod/wiki/i18n-messages-in-the-scaffolding
+
+isRegistered :: Handler AuthResult
+isRegistered = do
+  mauth <- maybeAuth
+  case mauth of
+       Nothing -> return AuthenticationRequired
+       _ -> return Authorized
