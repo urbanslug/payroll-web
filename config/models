@@ -1,6 +1,7 @@
 User
-    ident Text
-    UniqueUser ident
+    name Text
+    password Text Maybe
+    UniqueUser name
     deriving Typeable
 Payslip
   employeeNumber Int
@@ -20,5 +21,5 @@ Processed
   netSalary Int
   payslip PayslipId
   UniquePayslip payslip
-  owner UserId  
+  owner UserId 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

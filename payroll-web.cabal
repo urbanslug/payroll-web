@@ -24,6 +24,7 @@ library
                      Handler.Home
                      Handler.PayslipNew
                      Handler.PayslipShow
+                     Handler.SignUp
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -84,6 +85,7 @@ library
                  , vector
                  , time
                  , payroll-core
+                 , yesod-auth-hashdb             >= 1.4
 
 executable         payroll-web
     if flag(library-only)
