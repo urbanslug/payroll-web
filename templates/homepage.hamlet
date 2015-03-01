@@ -8,4 +8,5 @@
       $forall Entity payslipId payslip <- myPayslips
         <ul>
           <li><a href=@{PayslipShowR payslipId}>Payslip for employee number: #{payslipEmployeeNumber payslip}
+    <a class="btn btn-default" href=@{AuthR LogoutR}>Log out
       
