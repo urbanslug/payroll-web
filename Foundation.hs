@@ -4,7 +4,7 @@ import Import.NoFoundation
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Text.Hamlet          (hamletFile)
 import Text.Jasmine         (minifym)
-import Yesod.Auth.BrowserId (authBrowserId)
+import Yesod.Auth.HashDB    (HashDBUser(..), getAuthIdHashDB, authHashDB)
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
@@ -69,14 +69,12 @@ instance Yesod App where
 
     -- Routes not requiring authentication.
     isAuthorized (AuthR _) _ = return Authorized
-    isAuthorized FaviconR _ = return Authorized
-    isAuthorized RobotsR _ = return Authorized
-
-    -- My auth stuff
-    isAuthorized HomeR _ = isRegistered
-
+    isAuthorized FaviconR  _ = return Authorized
+    isAuthorized RobotsR   _ = return Authorized
+    isAuthorized SignUpR   _ = return Authorized
+    
     -- Default to AuthenticationRequired.
-    isAuthorized _ _ = return Authorized
+    isAuthorized _ _ = isRegistered
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
@@ -105,26 +103,13 @@ instance Yesod App where
             || level == LevelError
 
     makeLogger = return . appLogger
+       
 
--- To check whether a user is in the User DB
-isRegistered :: (YesodAuthPersist master,
-                 PersistStore (PersistEntityBackend (AuthEntity master)),
-                 PersistEntity (AuthEntity master), Typeable (AuthEntity master),
-                 AuthId master ~ Key (AuthEntity master),
-                 YesodPersistBackend master
-                 ~ PersistEntityBackend (AuthEntity master)) =>
-                HandlerT master IO AuthResult
-isRegistered =  do
-  mauth <- maybeAuth
-  case mauth of
-   Nothing -> return AuthenticationRequired
-   Just (Entity uid _) -> runDB $ do
-     dbUser <- get uid
-     case dbUser of
-      (Just _) -> return Authorized
-      Nothing -> return AuthenticationRequired
+-- Make users an instance of HashDB
+instance HashDBUser User where
+  userPasswordHash = userPassword
+  setPasswordHash h u = u { userPassword = Just h}
                
-
 -- How to run database actions.
 instance YesodPersist App where
     type YesodPersistBackend App = SqlBackend
@@ -144,19 +129,14 @@ instance YesodAuth App where
     -- Override the above two destinations when a Referer: header is present
     redirectToReferer _ = True
 
-    getAuthId creds = runDB $ do
-        x <- getBy $ UniqueUser $ credsIdent creds
-        case x of
-            Just (Entity uid _) -> return $ Just uid
-            Nothing -> do
-                fmap Just $ insert User
-                    { userIdent = credsIdent creds }
+    getAuthId = getAuthIdHashDB AuthR (Just . UniqueUser)
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = [authBrowserId def]
+    authPlugins _ = [ authHashDB (Just . UniqueUser)]
 
     authHttpManager = getHttpManager
-
+    
+    
 instance YesodAuthPersist App
 
 -- This instance is required to use forms. You can modify renderMessage to
@@ -174,3 +154,10 @@ unsafeHandler = Unsafe.fakeHandlerGetLogger appLogger
 -- https://github.com/yesodweb/yesod/wiki/Sending-email
 -- https://github.com/yesodweb/yesod/wiki/Serve-static-files-from-a-separate-domain
 -- https://github.com/yesodweb/yesod/wiki/i18n-messages-in-the-scaffolding
+
+isRegistered :: Handler AuthResult
+isRegistered = do
+  mauth <- maybeAuth
+  case mauth of
+       Nothing -> return AuthenticationRequired
+       _ -> return Authorized
