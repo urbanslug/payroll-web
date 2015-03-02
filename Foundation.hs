@@ -4,7 +4,7 @@ import Import.NoFoundation
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Text.Hamlet          (hamletFile)
 import Text.Jasmine         (minifym)
-import Yesod.Auth.HashDB    (HashDBUser(..), getAuthIdHashDB, authHashDB)
+import Yesod.Auth.HashDB    (HashDBUser(..), getAuthIdHashDB, authHashDBWithForm)
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
@@ -132,10 +132,12 @@ instance YesodAuth App where
     getAuthId = getAuthIdHashDB AuthR (Just . UniqueUser)
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = [ authHashDB (Just . UniqueUser)]
+    authPlugins _ = [ authHashDBWithForm myform (Just . UniqueUser)]
 
     authHttpManager = getHttpManager
-    
+
+myform :: Route App -> Widget
+myform action = $(whamletFile "templates/login.hamlet")
     
 instance YesodAuthPersist App
 
