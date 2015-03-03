@@ -15,6 +15,15 @@ ready(function() {
     del.send();
   });
 
+
+  document.getElementById("xlsx").addEventListener('click', function(event) {
+    var del = new XMLHttpRequest();
+    del.onload = function (event) {window.location = "@{PayslipShowR}"};
+    del.open('post', "@{PayslipShowR payslipId}", 'true');
+    del.send();
+  });
+
+  
   document.getElementById("delete").addEventListener('click', function(event) {
     el = document.getElementById("overlay");
 	  el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";

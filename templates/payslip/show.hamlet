@@ -47,6 +47,7 @@ $if (payslipOwner payslip) == uid
   <input type="button" id="delete" class="btn btn-default" value="Delete payslip" >
   <a class="btn btn-default" href=@{PayslipNewR}>Add a payslip
   <a class="btn btn-default" href=@{HomeR}>Home
+  <input type="button" id="xlsx" class="btn btn-default" value="Export spreadsheet">
   <div id="overlay">
     <div>
       <p>

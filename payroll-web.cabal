@@ -85,7 +85,8 @@ library
                  , vector
                  , time
                  , payroll-core
-                 , yesod-auth-hashdb             >= 1.4
+                 , yesod-auth-hashdb             >= 1.4        && < 1.5
+                 , SpreadsheetML
 
 executable         payroll-web
     if flag(library-only)

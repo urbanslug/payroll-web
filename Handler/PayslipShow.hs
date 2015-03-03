@@ -20,3 +20,6 @@ deletePayslipShowR payslipId = do
       True -> runDB $ delete payslipId
       False -> return ()
    Nothing -> return ()
+
+postPayslipShowR :: PayslipId -> Handler ()
+postPayslipShowR = error "to do"
