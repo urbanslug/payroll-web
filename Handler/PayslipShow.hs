@@ -22,4 +22,4 @@ deletePayslipShowR payslipId = do
    Nothing -> return ()
 
 postPayslipShowR :: PayslipId -> Handler ()
-postPayslipShowR = error "to do"
+postPayslipShowR payslipId = error "to do"

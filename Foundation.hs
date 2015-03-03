@@ -73,7 +73,7 @@ instance Yesod App where
     isAuthorized RobotsR   _ = return Authorized
     isAuthorized SignUpR   _ = return Authorized
     
-    -- Default to AuthenticationRequired.
+    -- 
     isAuthorized _ _ = isRegistered
 
     -- This function creates static content files in the static folder
@@ -104,6 +104,14 @@ instance Yesod App where
 
     makeLogger = return . appLogger
        
+
+isRegistered :: Handler AuthResult
+isRegistered = do
+  mauth <- maybeAuth
+  case mauth of
+       Nothing -> return AuthenticationRequired
+       _ -> return Authorized
+
 
 -- Make users an instance of HashDB
 instance HashDBUser User where
@@ -156,10 +164,3 @@ unsafeHandler = Unsafe.fakeHandlerGetLogger appLogger
 -- https://github.com/yesodweb/yesod/wiki/Sending-email
 -- https://github.com/yesodweb/yesod/wiki/Serve-static-files-from-a-separate-domain
 -- https://github.com/yesodweb/yesod/wiki/i18n-messages-in-the-scaffolding
-
-isRegistered :: Handler AuthResult
-isRegistered = do
-  mauth <- maybeAuth
-  case mauth of
-       Nothing -> return AuthenticationRequired
-       _ -> return Authorized

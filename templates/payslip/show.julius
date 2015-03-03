@@ -18,7 +18,7 @@ ready(function() {
 
   document.getElementById("xlsx").addEventListener('click', function(event) {
     var del = new XMLHttpRequest();
-    del.onload = function (event) {window.location = "@{PayslipShowR}"};
+    del.onload = function (event) {window.location = "@{PayslipShowR payslipId}"};
     del.open('post', "@{PayslipShowR payslipId}", 'true');
     del.send();
   });

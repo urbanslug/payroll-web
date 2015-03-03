@@ -1,3 +1,4 @@
+{-# InstanceSigs #-}
 module Handler.Home where
 
 import Import
@@ -14,7 +15,45 @@ import Import
 getHomeR :: Handler Html
 getHomeR = do
   (Entity uid _) <- requireAuth
-  myPayslips <- runDB $ selectList [PayslipOwner ==. uid] [Asc PayslipEmployeeNumber]
+  myPayslips <- runDB $ selectList [PayslipOwner ==. uid] [Asc PayslipId]
+  myProcessed <- runDB $ selectList [ProcessedOwner ==. uid] [Asc ProcessedPayslip]
+  let slips = etPayslips myPayslips
+      proce = etPayslips myProcessed
+      br = b slips proce
+      payId = payIdd myPayslips
+      tSlips = mconcatSlip uid slips
+      tProc = mconcatProc uid payId proce
   defaultLayout $ do
     setTitle "Payroll"
     $(widgetFile "homepage")
+
+b :: [Payslip] -> [Processed] -> [(Payslip, Processed)]
+b [] _ = []
+b _ [] = []
+b (x:xs) (y:ys) = (x,y) : b xs ys
+
+payIdd :: [Entity Payslip] -> PayslipId
+payIdd ((Entity br _):xs) = br
+
+etPayslips :: [Entity _t] -> [_t]
+etPayslips [] = []
+etPayslips ((Entity _ p): xs) = p : etPayslips xs
+
+memptySlip :: UserId -> Payslip 
+memptySlip u = Payslip 0 0 0 0 0 u
+
+memptyProc :: UserId -> PayslipId -> Processed
+memptyProc u p = Processed 0 0 0 0 0 0 0 0 p u
+
+mappendSlip :: UserId -> Payslip -> Payslip -> Payslip
+mappendSlip u (Payslip e b a d i _) (Payslip x y z j h _) = Payslip (e+x) (b+y) (a+z) (d+j) (i+h) u
+
+mappendProc :: UserId -> PayslipId -> Processed -> Processed -> Processed
+mappendProc u p (Processed a b c d e f g h _ _) (Processed m n o z q r s t _ _) =
+  Processed (a+m) (b+n) (c+o) (d+z) (e+q) (f+r) (g+s) (h+t) p u
+
+mconcatSlip :: UserId -> [Payslip] -> Payslip
+mconcatSlip u xs = foldr (\x acc -> mappendSlip u acc x) (memptySlip u) xs
+
+mconcatProc :: UserId -> PayslipId -> [Processed] -> Processed
+mconcatProc u p xs = foldr (\x acc -> mappendProc u p acc x) (memptyProc u p) xs
