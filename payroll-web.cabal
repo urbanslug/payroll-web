@@ -25,6 +25,8 @@ library
                      Handler.PayslipNew
                      Handler.PayslipShow
                      Handler.SignUp
+                     Handler.ExportXls
+    other-modules:   Handler.BuildTable
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

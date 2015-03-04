@@ -54,4 +54,5 @@
           <td>#{processedNetSalary tProc}
   
     <a class="btn btn-default" href=@{AuthR LogoutR}>Log out
+    <a class="btn btn-default" method="get"  href=@{ExportXlsR}>Export Xls
       

@@ -1,7 +1,7 @@
-{-# InstanceSigs #-}
 module Handler.Home where
 
 import Import
+
 -- import Yesod.Form.Bootstrap3 (BootstrapFormLayout (..), renderBootstrap3,
 --                              withSmallInput)
 
@@ -20,7 +20,7 @@ getHomeR = do
   let slips = etPayslips myPayslips
       proce = etPayslips myProcessed
       br = b slips proce
-      payId = payIdd myPayslips
+      ((Entity payId _):_) = myPayslips
       tSlips = mconcatSlip uid slips
       tProc = mconcatProc uid payId proce
   defaultLayout $ do
@@ -31,9 +31,6 @@ b :: [Payslip] -> [Processed] -> [(Payslip, Processed)]
 b [] _ = []
 b _ [] = []
 b (x:xs) (y:ys) = (x,y) : b xs ys
-
-payIdd :: [Entity Payslip] -> PayslipId
-payIdd ((Entity br _):xs) = br
 
 etPayslips :: [Entity _t] -> [_t]
 etPayslips [] = []
@@ -46,11 +43,11 @@ memptyProc :: UserId -> PayslipId -> Processed
 memptyProc u p = Processed 0 0 0 0 0 0 0 0 p u
 
 mappendSlip :: UserId -> Payslip -> Payslip -> Payslip
-mappendSlip u (Payslip e b a d i _) (Payslip x y z j h _) = Payslip (e+x) (b+y) (a+z) (d+j) (i+h) u
+mappendSlip u (Payslip e w a d i _) (Payslip x y z j h _) = Payslip (e+x) (w+y) (a+z) (d+j) (i+h) u
 
 mappendProc :: UserId -> PayslipId -> Processed -> Processed -> Processed
-mappendProc u p (Processed a b c d e f g h _ _) (Processed m n o z q r s t _ _) =
-  Processed (a+m) (b+n) (c+o) (d+z) (e+q) (f+r) (g+s) (h+t) p u
+mappendProc u p (Processed a j c d e f g h _ _) (Processed m n o z q r s t _ _) =
+  Processed (a+m) (j+n) (c+o) (d+z) (e+q) (f+r) (g+s) (h+t) p u
 
 mconcatSlip :: UserId -> [Payslip] -> Payslip
 mconcatSlip u xs = foldr (\x acc -> mappendSlip u acc x) (memptySlip u) xs
