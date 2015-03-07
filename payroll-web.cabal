@@ -25,6 +25,8 @@ library
                      Handler.PayslipNew
                      Handler.PayslipShow
                      Handler.SignUp
+                     Handler.ExportXls
+    other-modules:   Handler.BuildTable
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -85,7 +87,8 @@ library
                  , vector
                  , time
                  , payroll-core
-                 , yesod-auth-hashdb             >= 1.4
+                 , yesod-auth-hashdb             >= 1.4        && < 1.5
+                 , SpreadsheetML
 
 executable         payroll-web
     if flag(library-only)
@@ -132,3 +135,4 @@ test-suite test
                  , hspec >= 2.0.0
                  , classy-prelude
                  , classy-prelude-yesod
+                 , yesod-auth

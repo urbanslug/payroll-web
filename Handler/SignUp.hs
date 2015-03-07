@@ -6,8 +6,8 @@ import Yesod.Auth.HashDB (setPassword)
 
 signUpForm :: AForm Handler User
 signUpForm = User
-  <$> areq textField (bfs ("Username" :: Text)) Nothing
-  <*> (Just <$> areq passwordField (bfs ("Password" :: Text)) Nothing)
+  <$> areq textField (bfs ("username" :: Text)) Nothing
+  <*> (Just <$> areq passwordField (bfs ("password" :: Text)) Nothing)
   <*  bootstrapSubmit (BootstrapSubmit {bsClasses="btn btn-default", bsValue="submit", bsAttrs=[("attr-name", "attr-value")]} :: BootstrapSubmit Text)
 
 getSignUpR :: Handler Html

@@ -13,5 +13,6 @@ cabal.sandbox.config
 .DS_Store
 *.swp
 *#
-.#
+.#*
 *~
+*.xls

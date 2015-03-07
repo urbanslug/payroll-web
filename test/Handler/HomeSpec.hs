@@ -1,7 +1,43 @@
 module Handler.HomeSpec (spec) where
 
 import TestImport
+import Yesod.Auth(Route(LoginR))
 
+spec :: Spec
+spec = withApp $ do
+  describe "Auth things" $ do
+    it "creates users" $ do
+      get SignUpR
+      statusIs 200
+
+      request $ do
+        byLabel "username" "user"
+        byLabel "password" "p"
+        setMethod "POST"
+        setUrl SignUpR
+      statusIs 200
+      
+    it "logs users in" $ do
+      get (AuthR LoginR)
+      statusIs 200
+
+      bodyContains "Login"
+
+      request $ do
+        byLabel "username" "user"
+        byLabel "password" "p"
+        setMethod "GET"
+        setUrl (AuthR LoginR)
+      statusIs 200
+
+    it "user has been logged in" $ do
+      get HomeR
+      statusIs 303
+      bodyContains "Login"
+    
+      
+
+{-
 spec :: Spec
 spec = withApp $ do
     it "loads the index and checks it looks right" $ do
@@ -30,3 +66,4 @@ spec = withApp $ do
         statusIs 200
         users <- runDB $ selectList ([] :: [Filter User]) []
         assertEqual "user table empty" 0 $ length users
+-}
