@@ -136,3 +136,6 @@ test-suite test
                  , classy-prelude
                  , classy-prelude-yesod
                  , yesod-auth
+                 , network-uri
+                 , http-types
+                 , wai-extra
