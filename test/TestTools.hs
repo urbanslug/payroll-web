@@ -18,7 +18,7 @@ testRoot = "http://localhost:3000"
 
 -- Adjust as necessary for the expected path part of the URL after login
 afterLogin :: ByteString
-afterLogin = ""
+afterLogin = "/"
 
 -- Force failure by swearing that black is white, and pigs can fly...
 assertFailure :: String -> YesodExample App ()

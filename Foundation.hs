@@ -73,7 +73,7 @@ instance Yesod App where
     isAuthorized RobotsR   _ = return Authorized
     isAuthorized SignUpR   _ = return Authorized
     
-    -- 
+    -- Everything else requires authorization.
     isAuthorized _ _ = isRegistered
 
     -- This function creates static content files in the static folder
@@ -111,7 +111,6 @@ isRegistered = do
   case mauth of
        Nothing -> return AuthenticationRequired
        _ -> return Authorized
-
 
 -- Make users an instance of HashDB
 instance HashDBUser User where

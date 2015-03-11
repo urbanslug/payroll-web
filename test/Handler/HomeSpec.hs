@@ -21,6 +21,12 @@ spec = withApp $ do
         byLabel "username" "user"
         byLabel "password" "p"
       statusIs 303 -- redirects after successful signup
-
-    it "logs in a user" $ do
       doLogin "user" "p"
+      
+    it "goes to login" $ do
+      get (AuthR LoginR)
+      bodyContains "Please Login."
+      
+      
+
+

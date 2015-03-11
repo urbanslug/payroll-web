@@ -1,6 +1,7 @@
 module Handler.Home where
 
 import Import
+-- import Foundation
 
 -- import Yesod.Form.Bootstrap3 (BootstrapFormLayout (..), renderBootstrap3,
 --                              withSmallInput)
@@ -12,6 +13,7 @@ import Import
 -- The majority of the code you will write in Yesod lives in these handler
 -- functions. You can spread them across multiple files if you are so
 -- inclined, or create a single monolithic file.
+
 getHomeR :: Handler Html
 getHomeR = do
   (Entity uid _) <- requireAuth
@@ -26,7 +28,7 @@ getHomeR = do
   defaultLayout $ do
     setTitle "Payroll"
     $(widgetFile "homepage")
-
+  
 b :: [Payslip] -> [Processed] -> [(Payslip, Processed)]
 b [] _ = []
 b _ [] = []
