@@ -9,3 +9,4 @@
 /payslip/!#PayslipId PayslipShowR GET POST DELETE
 /signup SignUpR GET POST
 /export/xls ExportXlsR GET
+/increment IncrementR GET POST

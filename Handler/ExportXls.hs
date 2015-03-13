@@ -8,17 +8,21 @@ import qualified Data.Text as Text
 import Text.XML.SpreadsheetML.Builder
 import Text.XML.SpreadsheetML.Writer
 import Text.XML.SpreadsheetML.Types
+import Control.Monad.IO.Class
+import Control.Monad
+import Data.Time.Clock
 
 getExportXlsR :: Handler Html
 getExportXlsR = do
   (Entity uid _) <- requireAuth
   myPayslips <- runDB $ selectList [PayslipOwner ==. uid] [Asc PayslipId]
   myProcessed <- runDB $ selectList [ProcessedOwner ==. uid] [Asc ProcessedPayslip]
+  day <- liftIO $ liftM utctDay getCurrentTime 
   let slips = fetcthIndividual myPayslips
       proce = fetcthIndividual myProcessed
       tupleList = makeTupleList slips proce -- [(Payslip, Processed)]
       ((Entity payId _):_) = myPayslips
-      totalSlips = mconcatSlip uid slips
+      totalSlips = mconcatSlip day uid slips
       totalProc = mconcatProc uid payId proce
   _ <- toFile $ genWorkbook $ heading : mkRowList tupleList ++ mkRowList [(totalSlips, totalProc)]
   addHeader "Content-Disposition" $ Text.concat
@@ -81,21 +85,21 @@ n cell_list = mkWorkbook $ (mkWorksheet (Name "example") $ mkTable $ (mkRow cell
 toFile :: Workbook -> HandlerT App IO ()
 toFile work_book = (writeFile "static/example.xls" $ showSpreadsheet work_book) >> return ()
 
-memptySlip :: UserId -> Payslip 
-memptySlip u = Payslip 0 0 0 0 0 u
+memptySlip :: Day -> UserId -> Payslip 
+memptySlip d u = Payslip 0 0 0 0 0 d u
 
 memptyProc :: UserId -> PayslipId -> Processed
 memptyProc u p = Processed 0 0 0 0 0 0 0 0 p u
 
-mappendSlip :: UserId -> Payslip -> Payslip -> Payslip
-mappendSlip u (Payslip e w a d i _) (Payslip x y z j h _) = Payslip (e+x) (w+y) (a+z) (d+j) (i+h) u
+mappendSlip :: Day -> UserId -> Payslip -> Payslip -> Payslip
+mappendSlip c u (Payslip e w a d i _ _) (Payslip x y z j h _ _) = Payslip (e+x) (w+y) (a+z) (d+j) (i+h) c u
 
 mappendProc :: UserId -> PayslipId -> Processed -> Processed -> Processed
 mappendProc u p (Processed a j c d e f g h _ _) (Processed m n o z q r s t _ _) =
   Processed (a+m) (j+n) (c+o) (d+z) (e+q) (f+r) (g+s) (h+t) p u
 
-mconcatSlip :: UserId -> [Payslip] -> Payslip
-mconcatSlip u xs = foldr (\x acc -> mappendSlip u acc x) (memptySlip u) xs
+mconcatSlip :: Day -> UserId -> [Payslip] -> Payslip
+mconcatSlip c u xs = foldr (\x acc -> mappendSlip c u acc x) (memptySlip c u) xs
 
 mconcatProc :: UserId -> PayslipId -> [Processed] -> Processed
 mconcatProc u p xs = foldr (\x acc -> mappendProc u p acc x) (memptyProc u p) xs

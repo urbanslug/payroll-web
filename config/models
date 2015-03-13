@@ -9,6 +9,7 @@ Payslip
   allowances Int
   deductions Int
   insuranceRelief Int
+  createdOn Day
   owner UserId
 Processed
   taxableBenefits Int
@@ -21,5 +22,12 @@ Processed
   netSalary Int
   payslip PayslipId
   UniquePayslip payslip
-  owner UserId 
+  owner UserId
+Increment
+  employeeRange Text
+  basicSalary Double
+  allowances Double
+  deduction Double
+  owner UserId
+  
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)
