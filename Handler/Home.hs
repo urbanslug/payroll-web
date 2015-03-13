@@ -2,8 +2,10 @@ module Handler.Home where
 
 import Import
 import Control.Monad.IO.Class
-import Control.Monad
+import Control.Monad (liftM)
 import Data.Time.Clock
+import Data.Time.Calendar
+import Payroll
 
 -- import Foundation
 
@@ -33,7 +35,25 @@ getHomeR = do
   defaultLayout $ do
     setTitle "Payroll"
     $(widgetFile "homepage")
-  
+
+putHomeR :: Handler Html
+putHomeR = do
+  (Entity uid _) <- requireAuth
+  lastMonth <- liftIO $ liftM (addDays (-30)) $ liftM utctDay getCurrentTime
+  payslipsFromDB <- runDB $ selectList [PayslipOwner ==. uid, PayslipCreatedOn >=. lastMonth ] []
+  let listOfSlips = etPayslips payslipsFromDB
+  _ <- mapM save listOfSlips
+  redirect HomeR  
+
+
+-- ----------------------------
+save :: Payslip -> Handler Payslip
+save x@(Payslip e pbSal pal pded i cr o) = do
+  slipId <- runDB $ insert (Payslip e pbSal pal pded i (addDays 30 cr) o)
+  processed <- processPayslipM x slipId
+  processedId <- runDB $ insert processed
+  return x
+
 b :: [Payslip] -> [Processed] -> [(Payslip, Processed)]
 b [] _ = []
 b _ [] = []
@@ -61,3 +81,25 @@ mconcatSlip c u xs = foldr (\x acc -> mappendSlip c u acc x) (memptySlip c u) xs
 
 mconcatProc :: UserId -> PayslipId -> [Processed] -> Processed
 mconcatProc u p xs = foldr (\x acc -> mappendProc u p acc x) (memptyProc u p) xs
+
+processPayslipM :: (Monad m) => Payslip -> PayslipId -> m Processed
+processPayslipM p pId = return $ processPayslip p pId
+
+processPayslip :: Payslip -> PayslipId -> Processed
+processPayslip payslip@(Payslip _ basicSalary allowances deductions insuranceRelief _ _) payslipId =
+  let taxableB = taxableBenefits basicSalary [allowances]
+      taxableI = taxableIncome taxableB [deductions]
+      tThereon = taxThereOn taxableI
+      tPaye = paye tThereon insuranceRelief
+      netSal = netSalary taxableI tPaye
+  in  Processed { processedTaxableBenefits = taxableB, 
+                  processedTaxableIncome = taxableI,
+                  processedTaxThereOn = tThereon,
+                  processedNssf = nssf,
+                  processedNhif = nhif,
+                  processedPersonalRelief = personalRelief,
+                  processedPaye = tPaye,
+                  processedNetSalary = netSal,
+                  processedPayslip = payslipId,
+                  processedOwner = payslipOwner payslip
+                }

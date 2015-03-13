@@ -1,1 +1,18 @@
+function ready(fn) {
+  if (document.readyState != 'loading'){
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+
+ready(function() {
+  document.getElementById("roll-over").addEventListener('click', function(event) {
+    var roll = new XMLHttpRequest();
+    roll.onload = function (event) {window.location = "@{HomeR}"};
+    roll.open('put', "@{HomeR}", 'true');
+    roll.send();
+  });
+    
+});
 

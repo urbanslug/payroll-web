@@ -4,7 +4,7 @@
 /favicon.ico FaviconR GET
 /robots.txt RobotsR GET
 
-/ HomeR GET
+/ HomeR GET PUT
 /payslip/new        PayslipNewR  GET POST
 /payslip/!#PayslipId PayslipShowR GET POST DELETE
 /signup SignUpR GET POST

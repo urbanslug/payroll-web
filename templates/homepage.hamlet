@@ -56,3 +56,4 @@
     <a class="btn btn-default" href=@{AuthR LogoutR}>Log out
     <a class="btn btn-default" href=@{ExportXlsR}>Export Xls
     <a class="btn btn-default" href=@{IncrementR}>Increment
+    <input type="button" id="roll-over" class="btn btn-default" value="Roll Over">
