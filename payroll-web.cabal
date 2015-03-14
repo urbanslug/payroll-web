@@ -27,7 +27,8 @@ library
                      Handler.SignUp
                      Handler.ExportXls
                      Handler.Increment
-    other-modules:   Handler.BuildTable
+    other-modules:   Lib.BuildTable
+                     Lib.GenTotals
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
