@@ -4,7 +4,7 @@ import Import
 
 getPayslipShowR :: PayslipId ->  Handler Html
 getPayslipShowR payslipId = do
-  (Entity uid _) <- requireAuth
+  (uid, _) <- startValues
   payslip <- runDB $ get404 payslipId
   (Entity _ processed) <- runDB $ getBy404 $ UniquePayslip payslipId
   defaultLayout $ do
@@ -12,7 +12,7 @@ getPayslipShowR payslipId = do
 
 deletePayslipShowR :: PayslipId -> Handler ()
 deletePayslipShowR payslipId = do
-  (Entity uid _) <- requireAuth
+  (uid, _) <- startValues
   maybePayslip <- runDB $ get payslipId
   case maybePayslip of
    Just payslip -> do

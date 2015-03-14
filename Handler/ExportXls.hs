@@ -8,10 +8,9 @@ import Lib.AssistDB
 
 getExportXlsR :: Handler Html
 getExportXlsR = do
-  (uid, _) <- startValues
+  (uid, day) <- startValues
   myPayslips <- runDB $ selectList [PayslipOwner ==. uid] [Asc PayslipId]
   myProcessed <- runDB $ selectList [ProcessedOwner ==. uid] [Asc ProcessedPayslip]
-  day <- liftIO $ liftM utctDay getCurrentTime 
   let slips = getValue myPayslips
       proce = getValue myProcessed
       tupleList = makeTupleList slips proce -- [(Payslip, Processed)]

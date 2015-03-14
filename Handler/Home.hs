@@ -8,10 +8,9 @@ import Lib.ProcessPayslip ()
 
 getHomeR :: Handler Html
 getHomeR = do
-  (uid, _) <- startValues
+  (uid, day) <- startValues
   myPayslips <- runDB $ selectList [PayslipOwner ==. uid] [Asc PayslipId]
   myProcessed <- runDB $ selectList [ProcessedOwner ==. uid] [Asc ProcessedPayslip]
-  day <- liftIO $ liftM utctDay getCurrentTime 
   let slips = getValue myPayslips
       proce = getValue myProcessed
       br = makeTupleList slips proce
