@@ -7,6 +7,7 @@ import Control.Monad
 import Data.Time.Clock
 import Lib.BuildTable
 import Lib.GenTotals
+import Lib.AssistDB
 
 getExportXlsR :: Handler Html
 getExportXlsR = do
@@ -27,19 +28,4 @@ getExportXlsR = do
   defaultLayout $ do
     setTitle "export"
     $(widgetFile "payslip/exportxls")
-
--- | Get a list of Value from a list of Entity Value.
---   In this case we get Payslip and Processed.
-getValue :: [Entity value] -> [value]
-getValue [] = []
-getValue ((Entity _ p): xs) = p : getValue xs
-
-
-
--- | Creates a list of tuples made up of:
---   a payslip and the associated processed.
-makeTupleList :: [Payslip] -> [Processed] -> [(Payslip, Processed)]
-makeTupleList [] _ = []
-makeTupleList _ [] = []
-makeTupleList (x:xs) (y:ys) = (x,y) : makeTupleList xs ys
 

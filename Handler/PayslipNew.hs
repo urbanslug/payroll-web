@@ -6,6 +6,7 @@ import Control.Monad.IO.Class
 import Control.Monad
 import Data.Time.Clock
 import Payroll
+import Lib.ProcessPayslip
 
 payslipForm :: Day -> Key User -> AForm Handler Payslip
 payslipForm day uid  =  Payslip
@@ -42,24 +43,3 @@ postPayslipNewR = do
        redirect $ PayslipShowR payslipId
    _ -> defaultLayout $(widgetFile "payslip/new")
 
-processPayslipM :: (Monad m) => Payslip -> PayslipId -> m Processed
-processPayslipM p pId = return $ processPayslip p pId
-
-processPayslip :: Payslip -> PayslipId -> Processed
-processPayslip payslip@(Payslip _ basicSalary allowances deductions insuranceRelief _ _) payslipId =
-  let taxableB = taxableBenefits basicSalary [allowances]
-      taxableI = taxableIncome taxableB [deductions]
-      tThereon = taxThereOn taxableI
-      tPaye = paye tThereon insuranceRelief
-      netSal = netSalary taxableI tPaye
-  in  Processed { processedTaxableBenefits = taxableB, 
-                  processedTaxableIncome = taxableI,
-                  processedTaxThereOn = tThereon,
-                  processedNssf = nssf,
-                  processedNhif = nhif,
-                  processedPersonalRelief = personalRelief,
-                  processedPaye = tPaye,
-                  processedNetSalary = netSal,
-                  processedPayslip = payslipId,
-                  processedOwner = payslipOwner payslip
-                }

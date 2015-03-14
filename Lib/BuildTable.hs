@@ -7,6 +7,10 @@ Maintainer  : mwanikibusiness@gmail.com
 Stability   : Experimental
 Portability : See README
 
+Code that helps in exporting the payroll as an xls file.
+-}
+
+{-
 The idea is to keep to DRY and adhere to best practices
 as much as possible therefore breaking away code that
 isn't specific to the handler and may be used by other handlers.

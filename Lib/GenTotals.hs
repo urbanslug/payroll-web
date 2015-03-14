@@ -17,7 +17,6 @@ module Lib.GenTotals where
 import Import
 import Data.Time.Calendar
 
--- For Payslip
 
 -- | mempty instance for a Payslip value
 memptySlip :: Day -> UserId -> Payslip 

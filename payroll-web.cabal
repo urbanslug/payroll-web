@@ -29,6 +29,8 @@ library
                      Handler.Increment
     other-modules:   Lib.BuildTable
                      Lib.GenTotals
+                     Lib.AssistDB
+                     Lib.ProcessPayslip
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

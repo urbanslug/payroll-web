@@ -7,6 +7,8 @@ import Data.Time.Calendar
 import Data.Time.Clock
 import Control.Monad (liftM)
 import Control.Monad.IO.Class
+import Lib.ProcessPayslip
+import Lib.AssistDB
 
 -- | Form for inputting increments.
 inrementForm :: UserId -> AForm Handler Increment
@@ -34,24 +36,11 @@ postIncrementR = do
    FormSuccess increment -> do
      lastMonth <- liftIO $ liftM (addDays (-30)) $ liftM utctDay getCurrentTime
      payslipsFromDB <- runDB $ selectList [PayslipOwner ==. uid, PayslipCreatedOn >=. lastMonth ] []
-     let payslipList = extractPayslips payslipsFromDB
+     let payslipList = getValue payslipsFromDB
          listOfSlips = runIncrement increment payslipList
      _ <- mapM save listOfSlips
      redirect $ HomeR
    _ -> defaultLayout $(widgetFile "increment")
-
-
-save :: Payslip -> Handler Payslip
-save x = do
-  slipId <- runDB $ insert x
-  processed <- processPayslipM x slipId
-  processedId <- runDB $ insert processed
-  return x
-  
-
-extractPayslips :: [Entity Payslip] -> [Payslip]
-extractPayslips [] = []
-extractPayslips ((Entity _ payslip): xs) = payslip : extractPayslips xs
 
 runIncrement :: Increment -> [Payslip] -> [Payslip]
 runIncrement _ [] = []
@@ -59,28 +48,8 @@ runIncrement inc@(Increment _ ibSal ial ided _) ((Payslip e pbSal pal pded i cr 
   (Payslip e (ibSal % pbSal) (ial % pal) (ided % pded) i (addDays 30 cr) o): runIncrement inc xs
 
 
--- | See it as x % of y
+-- | Read it as x % of y
+-- >>> 5 % 100
+-- 5
 (%) :: Double -> Int -> Int
 (%) x y = round $ ((100.0 + x)/100) * fromIntegral y
-  
-processPayslipM :: (Monad m) => Payslip -> PayslipId -> m Processed
-processPayslipM p pId = return $ processPayslip p pId
-
-processPayslip :: Payslip -> PayslipId -> Processed
-processPayslip payslip@(Payslip _ basicSalary allowances deductions insuranceRelief _ _) payslipId =
-  let taxableB = taxableBenefits basicSalary [allowances]
-      taxableI = taxableIncome taxableB [deductions]
-      tThereon = taxThereOn taxableI
-      tPaye = paye tThereon insuranceRelief
-      netSal = netSalary taxableI tPaye
-  in  Processed { processedTaxableBenefits = taxableB, 
-                  processedTaxableIncome = taxableI,
-                  processedTaxThereOn = tThereon,
-                  processedNssf = nssf,
-                  processedNhif = nhif,
-                  processedPersonalRelief = personalRelief,
-                  processedPaye = tPaye,
-                  processedNetSalary = netSal,
-                  processedPayslip = payslipId,
-                  processedOwner = payslipOwner payslip
-                }
