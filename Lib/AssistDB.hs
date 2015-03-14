@@ -37,5 +37,5 @@ save :: Payslip -> Handler Payslip
 save slip@(Payslip e pbSal pal pded i cr o) = do
   slipId <- runDB $ insert (Payslip e pbSal pal pded i (addDays 30 cr) o)
   processed <- processPayslipM slip slipId
-  processedId <- runDB $ insert processed
+  _ <- runDB $ insert processed
   return slip

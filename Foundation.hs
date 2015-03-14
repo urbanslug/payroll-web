@@ -111,6 +111,14 @@ isRegistered = do
   case mauth of
        Nothing -> return AuthenticationRequired
        _ -> return Authorized
+       
+-- To avoid code replication over various handlers.
+-- Values needed at the beginning of a handler.
+startValues :: Handler (UserId, Day)
+startValues = do
+  (Entity uid _ ) <- requireAuth
+  day <- liftIO $ liftM utctDay getCurrentTime
+  return (uid, day)
 
 -- Make users an instance of HashDB
 instance HashDBUser User where

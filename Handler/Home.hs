@@ -1,18 +1,14 @@
 module Handler.Home where
 
 import Import
-import Control.Monad.IO.Class
-import Control.Monad (liftM)
-import Data.Time.Clock
-import Data.Time.Calendar
-import Payroll
+import Data.Time.Calendar (addDays)
 import Lib.GenTotals
 import Lib.AssistDB
-import Lib.ProcessPayslip
+import Lib.ProcessPayslip ()
 
 getHomeR :: Handler Html
 getHomeR = do
-  (Entity uid _) <- requireAuth
+  (uid, _) <- startValues
   myPayslips <- runDB $ selectList [PayslipOwner ==. uid] [Asc PayslipId]
   myProcessed <- runDB $ selectList [ProcessedOwner ==. uid] [Asc ProcessedPayslip]
   day <- liftIO $ liftM utctDay getCurrentTime 
@@ -28,8 +24,8 @@ getHomeR = do
 
 putHomeR :: Handler Html
 putHomeR = do
-  (Entity uid _) <- requireAuth
-  lastMonth <- liftIO $ liftM (addDays (-30)) $ liftM utctDay getCurrentTime
+  (uid, day) <- startValues
+  lastMonth <- return $ addDays (-30) day
   payslipsFromDB <- runDB $ selectList [PayslipOwner ==. uid, PayslipCreatedOn >=. lastMonth ] []
   let listOfSlips = getValue payslipsFromDB
   _ <- mapM save listOfSlips

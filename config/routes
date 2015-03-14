@@ -6,7 +6,7 @@
 
 / HomeR GET PUT
 /payslip/new        PayslipNewR  GET POST
-/payslip/!#PayslipId PayslipShowR GET POST DELETE
+/payslip/!#PayslipId PayslipShowR GET DELETE
 /signup SignUpR GET POST
 /export/xls ExportXlsR GET
 /increment IncrementR GET POST
