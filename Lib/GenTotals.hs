@@ -15,8 +15,6 @@ I plan to make these real monoids.
 module Lib.GenTotals where
 
 import Import
-import Data.Time.Calendar
-
 
 -- | mempty instance for a Payslip value
 memptySlip :: Day -> UserId -> Payslip 
