@@ -4,7 +4,7 @@ import Import.NoFoundation
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Text.Hamlet          (hamletFile)
 import Text.Jasmine         (minifym)
-import Yesod.Auth.HashDB    (HashDBUser(..), getAuthIdHashDB, authHashDBWithForm)
+import Yesod.Auth.GoogleEmail2
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
@@ -71,7 +71,7 @@ instance Yesod App where
     isAuthorized (AuthR _) _ = return Authorized
     isAuthorized FaviconR  _ = return Authorized
     isAuthorized RobotsR   _ = return Authorized
-    isAuthorized SignUpR   _ = return Authorized
+
     
     -- Everything else requires authorization.
     isAuthorized _ _ = isRegistered
@@ -104,14 +104,37 @@ instance Yesod App where
 
     makeLogger = return . appLogger
        
-
 isRegistered :: Handler AuthResult
 isRegistered = do
   mauth <- maybeAuth
   case mauth of
-       Nothing -> return AuthenticationRequired
+       Nothing -> return Authorized
        _ -> return Authorized
-       
+
+{- 
+buildUser :: Creds m -> Maybe User
+buildUser (Creds csPlugin csIdent csExtra) =
+    User <$> lookup "name" csExtra
+         <*> lookup "email" csExtra
+         <*> pure csPlugin
+         <*> pure csIdent
+-}
+buildUser :: Creds m -> Maybe User
+buildUser (Creds csPlugin csIdent csExtra) =
+        User <$> lookup "name" csExtra
+             <*> pure csIdent
+             <*> pure csPlugin
+             <*> pure csIdent
+
+
+replaceUser :: UserId -> Maybe User -> YesodDB App UserId
+replaceUser uid (Just u) = replace uid u >> return uid
+replaceUser uid _        = return uid
+
+insertUser :: Maybe User -> YesodDB App (Maybe UserId)
+insertUser (Just u) = fmap Just $ insert u
+insertUser _        = return Nothing
+
 -- To avoid code replication over various handlers.
 -- Values needed at the beginning of a handler.
 startValues :: Handler (UserId, Day)
@@ -119,11 +142,6 @@ startValues = do
   (Entity uid _ ) <- requireAuth
   day <- liftIO $ liftM utctDay getCurrentTime
   return (uid, day)
-
--- Make users an instance of HashDB
-instance HashDBUser User where
-  userPasswordHash = userPassword
-  setPasswordHash h u = u { userPassword = Just h}
                
 -- How to run database actions.
 instance YesodPersist App where
@@ -144,16 +162,23 @@ instance YesodAuth App where
     -- Override the above two destinations when a Referer: header is present
     redirectToReferer _ = True
 
-    getAuthId = getAuthIdHashDB AuthR (Just . UniqueUser)
+    getAuthId creds = runDB $ do
+        muser <- getBy $ UniqueUser (credsPlugin creds) (credsIdent creds)
+        let newUser = buildUser creds
+
+        case muser of
+            Just (Entity uid _) -> fmap Just $ replaceUser uid newUser
+            _                   -> insertUser newUser
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = [ authHashDBWithForm myform (Just . UniqueUser)]
+    authPlugins _ = [ authGoogleEmailSaveToken
+                      "388063239568-1d6m1gl80fm9dl0nrmk9805af8kul39l.apps.googleusercontent.com"
+                      "t01A_GWC-YSXhHYMzUfCz7H6"
+                    ]
 
     authHttpManager = getHttpManager
 
-myform :: Route App -> Widget
-myform action = $(whamletFile "templates/login.hamlet")
-    
+
 instance YesodAuthPersist App
 
 -- This instance is required to use forms. You can modify renderMessage to
