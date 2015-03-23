@@ -21,6 +21,7 @@ module Lib.BuildTable
        , genWorkbook
        , heading
        , toFile
+       , mkRowListT
          )
        where
 
@@ -46,6 +47,23 @@ heading = let header = [ "Employee Number"
                        , "Net Salary"
                        ]
              in mkRow $ map string header
+
+-- Will be removed. It's a quick hack.
+mkRowListT :: (Payslip, Processed) -> [Row]
+mkRowListT (pay,pro) = [mkRow $ [(string "Total")] ++ (map string $ map show $ 
+  [ payslipBasicSalary pay
+  , payslipAllowances pay
+  , processedTaxableBenefits pro
+  , payslipDeductions pay
+  , processedNssf pro
+  , processedNhif pro
+  , processedTaxableIncome pro
+  , processedTaxThereOn pro
+  , processedPersonalRelief pro
+  , payslipInsuranceRelief pay
+  , processedPaye pro
+  , processedNetSalary pro
+  ])]
 
 
 -- | A list of rows will be used to make a table.

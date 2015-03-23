@@ -17,6 +17,9 @@ deletePayslipShowR payslipId = do
   case maybePayslip of
    Just payslip -> do
      case ((payslipOwner payslip) == uid) of
-      True -> runDB $ delete payslipId
+      True -> runDB $ do
+        -- | delete processed first or else foreign key constraints won't let you delete a payslip.
+              deleteBy $ UniquePayslip payslipId 
+              delete payslipId
       False -> return ()
    Nothing -> return ()

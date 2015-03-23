@@ -13,6 +13,24 @@ ready(function() {
     roll.open('put', "@{HomeR}", 'true');
     roll.send();
   });
+
+
+  function hide(e) {
+    var id = e.currentTarget.id;
+    var toHide = document.getElementsByClassName(id)[0];
+    if (toHide.style.display == 'none')
+      toHide.style.display = 'block';
+    else
+      toHide.style.display = 'none';
+    //$(toHide).slideToggle("slow");
+  }
+
+    var ps = document.getElementsByTagName('a');
+
+    for (var i = 0; i < ps.length; i++){
+      ps[i].addEventListener('click', hide, false);
+    }
     
+
 });
 

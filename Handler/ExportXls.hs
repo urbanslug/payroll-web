@@ -17,7 +17,7 @@ getExportXlsR = do
       ((Entity payId _):_) = myPayslips
       totalSlips = mconcatSlip day uid slips
       totalProc = mconcatProc uid payId proce
-  _ <- toFile $ genWorkbook $ heading : mkRowList tupleList ++ mkRowList [(totalSlips, totalProc)]
+  _ <- toFile $ genWorkbook $ heading : mkRowList tupleList ++ mkRowListT (totalSlips, totalProc)
   _ <- addHeader "Content-Disposition" $ Text.concat ["attachment; filename=\"example.xls\""]
   _ <- sendFile "text/xls" "static/example.xls"
   defaultLayout $ do

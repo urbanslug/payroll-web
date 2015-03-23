@@ -5,6 +5,7 @@ import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Text.Hamlet          (hamletFile)
 import Text.Jasmine         (minifym)
 import Yesod.Auth.GoogleEmail2
+-- import Yesod.Auth.Dummy
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
@@ -111,14 +112,12 @@ isRegistered = do
        Nothing -> return Authorized
        _ -> return Authorized
 
-{- 
-buildUser :: Creds m -> Maybe User
-buildUser (Creds csPlugin csIdent csExtra) =
-    User <$> lookup "name" csExtra
-         <*> lookup "email" csExtra
-         <*> pure csPlugin
-         <*> pure csIdent
+{-
+addAuthBackDoor :: App -> [AuthPlugin App] -> [AuthPlugin App]
+addAuthBackDoor app =
+    if appAllowDummyAuth (appSettings app) then (authDummy :) else id
 -}
+
 buildUser :: Creds m -> Maybe User
 buildUser (Creds csPlugin csIdent csExtra) =
         User <$> lookup "name" csExtra
@@ -164,6 +163,7 @@ instance YesodAuth App where
 
     getAuthId creds = runDB $ do
         muser <- getBy $ UniqueUser (credsPlugin creds) (credsIdent creds)
+        _ <- lift $ print $ credsExtra creds -- To see what credsExtra holds.
         let newUser = buildUser creds
 
         case muser of
