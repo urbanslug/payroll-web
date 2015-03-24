@@ -1,5 +1,6 @@
 User
     name Text
+    image Text
     email Text
     plugin Text
     ident Text

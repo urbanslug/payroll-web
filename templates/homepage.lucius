@@ -1,6 +1,36 @@
+body {
+  color: #9B7D7D;
+  background-color: #1A0F0F;
+}
+
 table {
   width: 100%;
   text-align: center;
  	border-width: 1px;
   border-color: #666;
+}
+
+.per-month{
+  display:none;
+}
+
+#payroll-container{
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#profile-pic {
+  float: right;
+  background:url("#{profilePic}") no-repeat center center;
+  width: 100px;
+  height:100px;
+  position: relative;
+  display: inline-block;
+  -webkit-border-radius: 50em;
+	-moz-border-radius: 50em;
+	border-radius: 50em;
+}
+
+.jumbotron {
+  margin-top: 50px;
 }

@@ -5,6 +5,8 @@ import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Text.Hamlet          (hamletFile)
 import Text.Jasmine         (minifym)
 import Yesod.Auth.GoogleEmail2
+import Data.Text (splitOn)
+import Data.List((!!))
 -- import Yesod.Auth.Dummy
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
@@ -117,13 +119,15 @@ addAuthBackDoor :: App -> [AuthPlugin App] -> [AuthPlugin App]
 addAuthBackDoor app =
     if appAllowDummyAuth (appSettings app) then (authDummy :) else id
 -}
-
 buildUser :: Creds m -> Maybe User
 buildUser (Creds csPlugin csIdent csExtra) =
-        User <$> lookup "name" csExtra
+        User <$> lookup "displayName" csExtra
+             <*> case lookup "image" csExtra of
+                  Just texty -> Just $ (splitOn "\"" texty) !! 3
+                  _ -> Nothing
              <*> pure csIdent
              <*> pure csPlugin
-             <*> pure csIdent
+             <*> pure csIdent -- | Save email twice because I'm stupid.
 
 
 replaceUser :: UserId -> Maybe User -> YesodDB App UserId

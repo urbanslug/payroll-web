@@ -18,10 +18,10 @@ ready(function() {
   function hide(e) {
     var id = e.currentTarget.id;
     var toHide = document.getElementsByClassName(id)[0];
-    if (toHide.style.display == 'none')
-      toHide.style.display = 'block';
-    else
+    if (toHide.style.display == 'block')
       toHide.style.display = 'none';
+    else
+      toHide.style.display = 'block';
     //$(toHide).slideToggle("slow");
   }
 

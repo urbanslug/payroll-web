@@ -13,11 +13,13 @@ getHomeR = do
   (uid, day) <- startValues
   myPayslips <- runDB $ selectList [PayslipOwner ==. uid] [Asc PayslipId]
   myProcessed <- runDB $ selectList [ProcessedOwner ==. uid] [Asc ProcessedPayslip]
+  user <- runDB $ get404 uid
   let slips = getValue myPayslips
       proce = getValue myProcessed
       bree = makeTupleList slips proce
       br = groupTupleList $ gg (zz myPayslips) bree
       ((Entity payId _):_) = myPayslips
+      profilePic = takeWhile (/='=')(userImage user) ++ "=100"
       tSlips = mconcatSlip day uid slips
       tProc = mconcatProc uid payId proce
   defaultLayout $ do
